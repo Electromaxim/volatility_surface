@@ -44,3 +44,33 @@ def generate_mock_swiss_data(underlying: str) -> pd.DataFrame:
 if __name__ == "__main__":
     rog_df = generate_mock_swiss_data("ROG:SW")
     rog_df.to_parquet("data/ROG_mock.parquet")
+    
+    
+    
+    # Add to existing code
+def add_swiss_market_characteristics(df: pd.DataFrame) -> pd.DataFrame:
+    """Incorporates Swiss market quirks"""
+    # Swiss blue-chips often have high dividend yields
+    DIVIDEND_YIELDS = {"ROG:SW": 0.025, "ZURN:SW": 0.04, "NESN:SW": 0.022}
+    
+    # FINMA volatility pattern: steeper skew for financials
+    for idx, row in df.iterrows():
+        underlying = row['underlying']
+        div_yield = DIVIDEND_YIELDS.get(underlying, 0.0)
+        
+        # Adjust IV based on Swiss market conventions
+        if "ZURN" in underlying:  # Financial sector
+            skew_adjustment = 0.08 if row['moneyness'] < 1.0 else -0.05
+        else:  # Pharma/Food
+            skew_adjustment = 0.04 if row['moneyness'] < 1.0 else -0.02
+            
+        df.at[idx, 'implied_vol'] += skew_adjustment
+        df.at[idx, 'dividend_yield'] = div_yield
+        
+    return df
+
+# Modify the main function
+def generate_mock_swiss_data(underlying: str) -> pd.DataFrame:
+    ...
+    df = pd.DataFrame(data)
+    return add_swiss_market_characteristics(df)

@@ -23,3 +23,22 @@ stress_scenarios:
   - name: "2011-CHF-Peg"
     fx_shift: 
       EURCHF: -0.15
+      
+      stress_scenarios:
+  - name: "2020-COVID"
+    description: "VIX spike to 85, CHF rates drop"
+    vix: 85.0
+    rate_change: -0.015
+    equity_shock: -0.35
+    
+  - name: "2011-CHF-Peg"
+    description: "Swiss National Bank EURCHF floor removal"
+    fx_shift: 
+      EURCHF: -0.15
+    rate_change: -0.0075
+    vol_multiplier: 2.5
+    
+  - name: "Rothschild_Internal_Stress"
+    description: "Proprietary scenario for UHNW portfolios"
+    liquidity_drain: 0.4
+    credit_spread_widening: 0.02
