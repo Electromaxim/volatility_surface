@@ -1,0 +1,28 @@
+name: FRTB Validation Pipeline
+
+on: [push, pull_request]
+
+jobs:
+  frtb-compliance:
+    runs-on: ubuntu-latest
+    container: 
+      image: rothschild-vol-surface:latest
+      options: --gpus all
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Run arbitrage checks
+        run: |
+          python -m risk.validation.arbitrage_checks
+        
+      - name: Backtest 2011 CHF scenario
+        run: |
+          python -m risk.validation.backtester --event=2011_CHF_Peg
+        
+      - name: Generate compliance report
+        run: |
+          python reporting/compliance/pdf_generator.py
+        env:
+          FINMA_API_KEY: ${{ secrets.FINMA_API_KEY }}

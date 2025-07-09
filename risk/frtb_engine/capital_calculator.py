@@ -68,3 +68,8 @@ class FRTBCalculator:
             total += self.compute_delta_charge(position)
             total += self.compute_curvature_charge(position)
         return total
+        
+        
+surface = pricing.get_latest_surface()
+stress_vol = surface.apply_stress("2020_COVID")
+charge = compute_curvature_charge(stress_vol)
