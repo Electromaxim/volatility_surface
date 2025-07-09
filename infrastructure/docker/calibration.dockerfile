@@ -17,3 +17,7 @@ ENV CUDA_MEM_LIMIT="12GB"
 
 # Entrypoint for calibration job
 CMD ["python", "pricing/main.py", "--run-calibration"]
+
+# GPU Optimization added
+ENV CUDA_ARCH_LIST="8.0"  # Match EC2 instance GPU architecture
+RUN pip install --no-cache-dir cuda-python

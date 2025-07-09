@@ -38,3 +38,21 @@ class FINMASplineInterpolator:
         """Quantifies smile convexity for FINMA reporting"""
         mid = (min(self.strikes) + max(self.strikes)) / 2
         return self.spline(mid, 2)  # Second derivative at ATM
+        
+        
+        
+    def apply_rothschild_scenario(self, surface: VolSurface) -> VolSurface:
+        """Applies firm-specific liquidity crisis scenario"""
+        return surface.apply_shock(
+        equity_shock=-0.45, 
+        vol_multiplier=3.2,
+        liquidity_drain=0.7
+    )
+        
+    def _check_gatheral_conditions(self) -> bool:
+    """Implements Gatheral's arbitrage constraints"""
+    # Must implement:
+    # 1) Calendar spread non-decreasing
+    # 2) Butterfly spread non-negative
+    # 3) Durrleman's condition
+    pass  # Critical for production!

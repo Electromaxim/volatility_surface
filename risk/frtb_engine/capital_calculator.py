@@ -73,3 +73,12 @@ class FRTBCalculator:
 surface = pricing.get_latest_surface()
 stress_vol = surface.apply_stress("2020_COVID")
 charge = compute_curvature_charge(stress_vol)
+
+FINMA_SPECIFIC_ADJUSTMENTS = {
+    "equity": 1.25,
+    "rates": 1.18,
+    "fx": 1.30  # Higher multiplier for CHF pairs
+}
+
+def _get_finma_adjustment(asset_class: str) -> float:
+    return self.FINMA_SPECIFIC_ADJUSTMENTS.get(asset_class, 1.15)

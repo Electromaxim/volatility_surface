@@ -56,3 +56,11 @@ class BlackScholesPricer:
     ...
     df = pd.DataFrame(data)
     return add_swiss_market_characteristics(df)
+   
+   # Add dividend yield sourcing
+def get_swiss_dividend_yield(isin: str) -> float:
+    SWISS_DIV_YIELDS = {
+        "CH0038863350": 0.032,  # Rothschild & Co
+        "CH0012032048": 0.025   # Nestlé
+    }
+    return SWISS_DIV_YIELDS.get(isin, 0.02)
