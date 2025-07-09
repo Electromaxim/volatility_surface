@@ -82,3 +82,14 @@ FINMA_SPECIFIC_ADJUSTMENTS = {
 
 def _get_finma_adjustment(asset_class: str) -> float:
     return self.FINMA_SPECIFIC_ADJUSTMENTS.get(asset_class, 1.15)
+    
+    
+# enchancement
+from infrastructure.monitoring.error_handling import FINMAErrorTracker
+
+class CapitalCalculator:
+    def compute_charge(self, portfolio: Portfolio) -> float:
+        charge = ...
+        tracker = FINMAErrorTracker(...)
+        tracker.log_capital_breach(charge, RISK_LIMIT)
+        return charge

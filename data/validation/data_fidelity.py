@@ -1,21 +1,23 @@
+# data/validation/data_fidelity.py
+import pandas as pd
 import numpy as np
 from scipy import stats
-from sklearn.metrics import mean_absolute_error
 
 class SwissDataValidator:
     """Validates dataset against Swiss market characteristics"""
     
     SWISS_MARKET_THRESHOLDS = {
-        "volatility_range": (0.05, 0.65),  # Min/Max expected IV
-        "volume_distribution": "lognormal",  # Expected volume distribution
-        "bid_ask_spread": 0.02  # Max average spread for liquid options
+        "volatility_range": (0.05, 0.65),
+        "volume_distribution": "lognormal",
+        "bid_ask_spread": 0.02,
+        "min_volume": 50,
+        "max_spread_ratio": 0.1
     }
     
     def __init__(self, reference_data: pd.DataFrame):
         self.reference = reference_data
     
     def calculate_fidelity_score(self, test_data: pd.DataFrame) -> float:
-        """Quantifies similarity to real Swiss markets (0-1 scale)"""
         scores = []
         
         # 1. Volatility distribution similarity
@@ -26,25 +28,55 @@ class SwissDataValidator:
         
         # 2. Volume correlation
         volume_corr = test_data['volume'].corr(self.reference['volume'])
-        scores.append(max(0, volume_corr))  # Negative corr = 0
+        scores.append(max(0, volume_corr))
         
-        # 3. Crisis behavior check (vol spike magnitude)
+        # 3. Crisis behavior check
         if '2020-03-15' in test_data.index:
             crisis_vol = test_data.loc['2020-03-15', 'implied_vol'].mean()
             ref_crisis_vol = self.reference.loc['2020-03-15', 'implied_vol'].mean()
             crisis_score = 1 - abs(crisis_vol - ref_crisis_vol) / ref_crisis_vol
             scores.append(max(0, crisis_score))
         
+        # 4. Liquidity checks
+        liquidity_score = self._check_liquidity(test_data)
+        scores.append(liquidity_score)
+        
         return np.mean(scores)
     
     def _compare_distributions(self, test_series, ref_series) -> float:
-        """KL divergence scaled to 0-1 range"""
         hist_test, bin_edges = np.histogram(test_series, bins=50, density=True)
         hist_ref, _ = np.histogram(ref_series, bins=bin_edges, density=True)
-        
-        # Avoid zero bins
         hist_test = np.where(hist_test == 0, 1e-10, hist_test)
         hist_ref = np.where(hist_ref == 0, 1e-10, hist_ref)
-        
         kl_div = stats.entropy(hist_test, hist_ref)
-        return np.exp(-kl_div)  # Convert to similarity score
+        return np.exp(-kl_div)
+    
+    def _check_liquidity(self, df: pd.DataFrame) -> float:
+        """Ensure meets SIX liquidity requirements"""
+        valid_count = 0
+        total = len(df)
+        
+        # Check minimum volume
+        valid_count += sum(df['volume'] >= self.SWISS_MARKET_THRESHOLDS['min_volume'])
+        
+        # Check bid-ask spreads
+        spreads = (df['ask_iv'] - df['bid_iv']) / ((df['ask_iv'] + df['bid_iv'])/2)
+        valid_count += sum(spreads <= self.SWISS_MARKET_THRESHOLDS['max_spread_ratio'])
+        
+        return valid_count / (2 * total)  # Normalize to 0-1 range
+    
+    @staticmethod
+    def validate_six_requirements(df: pd.DataFrame) -> bool:
+        """Quick check for mandatory fields"""
+        required_columns = [
+            'underlying', 'expiration', 'strike', 'type',
+            'bid_iv', 'ask_iv', 'volume', 'open_interest'
+        ]
+        return all(col in df.columns for col in required_columns)
+        
+    def detect_data_drift(self, new_data: pd.DataFrame) -> dict:
+    drift_metrics = {}
+    for column in ['implied_vol', 'volume']:
+        drift = stats.ks_2samp(self.reference[column], new_data[column])
+        drift_metrics[column] = drift.statistic
+    return drift_metrics

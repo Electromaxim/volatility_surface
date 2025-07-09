@@ -1,0 +1,53 @@
+# risk_limits.yaml
+desk_limits:
+  equity_derivatives:
+    max_delta: 5000000    # Max delta exposure in CHF
+    max_vega: 250000      # Max vega exposure
+    max_gamma: 10000
+    var_95_1d: 1000000    # 1-day Value-at-Risk limit
+    es_97_5_10d: 5000000  # Expected Shortfall (FRTB) limit
+  
+  fixed_income:
+    max_dv01: 100000
+    max_ir_gamma: 5000
+    var_95_1d: 500000
+    es_97_5_10d: 2500000
+
+monitoring:
+  data_quality:
+    fidelity_threshold: 0.85     # Min data quality score
+    drift_threshold: 0.15        # Max KS statistic for drift
+    max_null_percentage: 0.01    # Max % of null values
+  
+  model_validation:
+    arbitrage_tolerance: 0.001   # Max arbitrage violation
+    backtest_coverage: 0.95      # Min coverage ratio
+    pnl_explanation: 0.85        # Min R² for P&L attribution
+  
+  capital_limits:
+    warning_threshold: 0.8       # Warn at 80% of limit
+    breach_level: 10000000        # Absolute breach level (10M CHF)
+    concentration_penalty: 1.25  # Multiplier for concentrated positions
+
+stress_scenarios:
+  - name: "CHF_Liquidity_Crisis"
+    parameters:
+      equity_shock: -0.40
+      vol_multiplier: 3.0
+      liquidity_drain: 0.75
+    apply_to: [equity_derivatives, structured_products]
+  
+  - name: "SNB_Rate_Shock"
+    parameters:
+      rate_change: 0.015
+      curve_steepening: 0.008
+    apply_to: [fixed_income, fx]
+
+reporting:
+  finma_submission:
+    frequency: "daily"
+    format: "XBRL"
+    deadline: "17:00 CET"
+  internal_reporting:
+    powerbi_refresh: "hourly"
+    audit_trail_retention: "7 years"

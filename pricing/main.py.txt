@@ -1,5 +1,0 @@
-from data.connectors import six_connector
-from pricing.analytic import svi_model
-
-chain = six_connector.load("CH0038863350")
-surface = svi_model.calibrate(chain).enhance_with_nn()

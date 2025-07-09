@@ -45,3 +45,14 @@ print(f"FRTB Capital Requirement: CHF {charge:,.2f}")
 # Save results
 rog_df.to_parquet("data/ROG_calibrated.parquet")
 print("Results saved to data/ROG_calibrated.parquet")
+
+# enchancement
+from data.validation.data_fidelity import SwissDataValidator
+
+# After generating mock data
+validator = SwissDataValidator(real_market_reference)
+fidelity_score = validator.calculate_fidelity_score(rog_df)
+print(f"Data Fidelity Score: {fidelity_score:.2%}")
+
+if not SwissDataValidator.validate_six_requirements(rog_df):
+    raise ValueError("Data missing SIX-required columns")
