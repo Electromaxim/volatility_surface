@@ -34,3 +34,12 @@ class SwissBacktester:
             results.append((date, portfolio_value))
         
         return pd.DataFrame(results, columns=['date', 'value'])
+        
+    def log_validation_record(self, scenario: str, coverage: float):
+    """Appends to compliance documentation"""
+    with open('../reporting/compliance/finma_documentation.md', 'a') as f:
+        f.write(
+            f"| {datetime.today().strftime('%Y-%m-%d')} "
+            f"| {scenario} | {coverage:.1%} | "
+            f"{'PASS' if coverage > 0.95 else 'FAIL'} |\n"
+        )

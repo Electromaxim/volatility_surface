@@ -1,0 +1,14 @@
+# Controls diagram auto-generation
+diagrams:
+  compliance:
+    generate: true
+    schedule: "daily"
+    output_dir: "reporting/compliance/diagrams/"
+  
+  lineage:
+    generate: true
+    trigger: "on_data_update"
+    formats: ["svg", "png"]
+  
+  risk_workflow:
+    generate: false

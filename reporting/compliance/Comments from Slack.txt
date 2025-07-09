@@ -1,0 +1,7 @@
+I'll structure the document according to private banking industry best practices, focusing on clarity, auditability, and regulatory alignment.
+
+The documentation must include:
+1. Key Regulatory Features: A detailed description of how the system meets FINMA requirements.
+2. Validation Records: A table of backtesting results.
+3. Certification: An electronic signature block for audit purposes.
+4. Regulatory Dependencies: A table of third-party libraries and their certification status.

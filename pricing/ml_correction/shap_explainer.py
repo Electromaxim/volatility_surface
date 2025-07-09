@@ -1,6 +1,17 @@
 import shap
 import torch
 
+
+# pricing/ml_correction/shap_explainer.py
+class SHAPExplainer:
+    def generate_report(self) -> dict:
+        """Model explainability for front office"""
+        return {
+            "R²": self.calculate_r_squared(),
+            "Feature Contributions": self.get_feature_importances(),
+            "FINMA_Compliance": "VAL_303"
+        }
+
 class SwissSHAPExplainer:
     """FINMA-compliant model explainability for NN corrections"""
     

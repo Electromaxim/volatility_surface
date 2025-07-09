@@ -10,7 +10,8 @@ class FINMAErrorTracker:
         "ARBITRAGE_VIOLATION": "MRM_202",
         "CAPITAL_BREACH": "FRTB_711",
         "DATA_FIDELITY_BREACH": "DQM_115",
-        "MODEL_DRIFT": "VAL_303"
+        "MODEL_DRIFT": "VAL_303",
+        "CLIENT_CONFIDENTIALITY": "BA_47"  # Swiss Banking Act
     }
     
     # Then modify the notify_finma method:

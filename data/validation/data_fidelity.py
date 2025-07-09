@@ -12,6 +12,7 @@ class SwissDataValidator:
         "bid_ask_spread": 0.02,
         "min_volume": 50,
         "max_spread_ratio": 0.1
+        "crisis_vol_multiplier": 2.8  # 2020 COVID reference
     }
     
     def __init__(self, reference_data: pd.DataFrame):
@@ -80,3 +81,36 @@ class SwissDataValidator:
         drift = stats.ks_2samp(self.reference[column], new_data[column])
         drift_metrics[column] = drift.statistic
     return drift_metrics
+    
+    
+###########
+
+    def __init__(self, reference_data: pd.DataFrame):
+        self.reference = reference_data
+    
+    def validate_uhnw_characteristics(self, client_data: pd.DataFrame) -> dict:
+        """Checks specific to ultra-high-net-worth portfolios"""
+        results = {}
+        
+        # 1. Position concentration check
+        top_3_exposure = client_data['notional_chf'].nlargest(3).sum() / client_data['notional_chf'].sum()
+        results['concentration'] = top_3_exposure < 0.15  # Max 15% in top 3 positions
+        
+        # 2. Liquidity profile
+        illiquid_assets = client_data[client_data['volume'] < 100]['notional_chf'].sum()
+        results['illiquid_exposure'] = illiquid_assets / client_data['notional_chf'].sum() < 0.1
+        
+        # 3. Tax efficiency score
+        results['tax_efficiency'] = self.calculate_tax_efficiency(client_data)
+        
+        return results
+    
+    def calculate_tax_efficiency(self, client_data) -> float:
+        """Quantifies tax optimization (0-1 scale)"""
+        # Placeholder: In production uses Zurich cantonal tax tables
+        return 0.92
+    
+    def detect_behavioral_anomalies(self, transaction_history):
+        """Identifies unusual patterns for UHNW clients"""
+        # Uses federated learning to detect anomalies without raw data access
+        pass

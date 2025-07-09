@@ -51,3 +51,19 @@ reporting:
   internal_reporting:
     powerbi_refresh: "hourly"
     audit_trail_retention: "7 years"
+    
+#For UHNW client protection features:
+private_banking:
+  client_tiers:
+    tier1:  # >CHF 100M
+      concentration_limit: 0.01
+      liquidity_requirement: 0.25
+      custom_scenarios:
+        - name: "Family Office Liquidity Crisis"
+          parameters:
+            redemption_pressure: 0.4
+            collateral_haircut: 0.3
+        
+    tier2:  # CHF 20-100M
+      concentration_limit: 0.03
+      liquidity_requirement: 0.15
