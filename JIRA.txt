@@ -1,0 +1,141 @@
+[1] UHNW scenario simulation not fully wired
+Evidence: Progress Assessment.txt indicates “UHNW scenario testing: 80%”.
+Action: Complete and validate all tiers (Tier1/2/3) across full workflows—ensure protection, tax optimization, and reporting integrate seamlessly.
+
+[2] Missing orchestration for full production pipeline
+Evidence: Scripts like run_calibration.sh, daily_frtb.py are present, but no confirmed orchestration engine (e.g., Airflow, Dagster, Prefect).
+Action: Wrap calibration, risk reporting, compliance exports, and alerting in a job orchestrator. Set dependencies and failure handling.
+
+[3] Incomplete UHNW protection logic in uhnw_protection.py
+Evidence: Code appears truncated near cost_bps, and some functions stubbed or missing.
+Action: Finalize pricing logic, tie into downstream reporting (cost, tax impact, breach alerts), and add unit tests.
+
+[4] Missing formal API docs / user manual
+Evidence: README.md and .md files are informative but lack onboarding or usage examples.
+Action:
+
+Add API reference (e.g., via Sphinx or MkDocs)
+
+Create onboarding README for quant/risk/compliance users
+
+Provide real-world runbooks (calibration, backtest, submission)
+
+[5] Central configuration lacks profiles for dev/stage/prod
+Evidence: Single config/params.yaml and risk_limits.yaml without clear environment scoping.
+Action:
+
+Separate config per environment (e.g., params.dev.yaml, params.prod.yaml)
+
+Introduce environment variables or .env support to control runtime context
+
+[6] No test coverage reports or CI test gates visible
+Evidence: tests/unit/ and tests/integration/ exist, but no CI badge, test runner integration, or coverage data.
+Action:
+
+Integrate pytest with pytest-cov, generate HTML coverage
+
+Add to GitHub Actions CI (.github/workflows/)
+
+Set up fail-fast gates on PRs for model validation
+
+[7] Stress scenarios logic exists but needs edge-case testing
+Evidence: stress_scenarios.yaml and classes for “CHF_Liquidity_Crisis”, “COVID”, “SNB_Rate_Shock” exist but no confirmation of test results.
+Action: Create tests for:
+
+Shock propagation through pricing and capital engine
+
+Volatility spike behavior
+
+Liquidation/capital breach detection
+
+[8] Data ingestion robustness under-tested
+Evidence: Synthetic data exists, six_connector.py tested in isolation. Failover to Bloomberg coded, but not heavily tested.
+Action:
+
+Add load and rate-limit tests
+
+Add malformed payload tests (nulls, schema violations)
+
+Verify timeouts and reconnections
+
+[9] Static code analysis / dependency audit not integrated
+Action:
+
+Add bandit, safety, or GitHub Dependabot integration
+
+Lock down Docker images with digest pins and known good hash
+
+[10] Secrets management (e.g., FINMA_API_KEY) is runtime-injected but not verified
+Evidence: Present in .yaml GitHub Actions, not checked for staging leaks.
+Action:
+
+Add validation logic for missing/invalid secrets
+
+Create secrets rotation policy and load mechanism (e.g., AWS SSM or Vault)
+
+[11] Confidentiality monitoring logic incomplete
+Evidence: Isolation Forest anomaly detection exists but marked pass() in one class; thresholds unclear.
+Action:
+
+Define threshold levels and trigger actions (freeze, log-only, notify)
+
+Simulate 2–3 “internal breach” scenarios to verify behavior
+
+## 5. Cloud Deployment / Infrastructure Gaps
+[12] Terraform setup lacks backend state config and environment switching
+Evidence: Files like main.tf, lambda_calibration.tf are valid but not modularized.
+Action:
+
+Set up terraform.tfbackend for S3 + DynamoDB
+
+Introduce workspaces or modules per environment
+
+Document how to apply/plan/destroy correctly
+
+[13] Dockerfiles are good, but no image signing / publishing pipeline
+Action:
+
+Add Dockerfile linting (e.g., Hadolint)
+
+Push images to ECR with tag/version tracking
+
+Enable image scanning via AWS or GitHub Advanced Security
+
+[14] No monitoring stack visible beyond CloudWatch setup script
+Action:
+
+Deploy and test dashboards for latency, calibration failures, FRTB capital breach
+
+Add notification hooks (Slack/email) for threshold triggers
+
+[15] No documented PowerBI refresh hooks or examples
+Evidence: .pbit files present, but unclear how they are linked to outputs.
+Action:
+
+Script dataset upload to PowerBI (e.g., via REST API or scheduled export)
+
+Provide sample refresh policy (hourly, daily, thresholds)
+
+[16] No visual explainability/reporting for NN models in UI
+Action:
+
+Export SHAP plots as PDFs
+
+Consider adding an HTML viewer/exporter with embedded explanations for compliance officers
+
+[17] No clear version tagging system for major releases
+Action:
+
+Add VERSION file
+
+Use Git tags and changelog per sprint
+
+Tie FINMA certification to specific config hash + version
+
+[18] Audit trail strategy not validated end-to-end
+Evidence: Mentions “audit trail covers 7 years” but no proof of write-once storage or backup rotation.
+Action:
+
+Confirm WORM (Write-Once, Read-Many) policy on data store
+
+Schedule backup policies for risk config and surface generation output

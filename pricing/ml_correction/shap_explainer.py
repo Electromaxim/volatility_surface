@@ -4,8 +4,15 @@ import torch
 
 # pricing/ml_correction/shap_explainer.py
 class SHAPExplainer:
+
     def generate_report(self) -> dict:
         """Model explainability for front office"""
+        # Add to existing class
+    def generate_report(self) -> Path:
+    
+    plt = shap.summary_plot(self.shap_values, self.features)
+    plt.savefig("reports/shap_summary.pdf")
+    return Path("reports/shap_summary.pdf")
         return {
             "R²": self.calculate_r_squared(),
             "Feature Contributions": self.get_feature_importances(),

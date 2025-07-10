@@ -1,0 +1,8 @@
+terraform {
+  backend "s3" {
+    bucket = "rothschild-tf-state"
+    key    = "vol-surface/terraform.tfstate"
+    region = "eu-central-2"
+    dynamodb_table = "tf-lock-table"
+  }
+}
