@@ -1,0 +1,5 @@
+- name: "2023_SNB_Hike"  
+  rate_change: +0.015  
+  fx_shift:  
+    USDCHF: -0.12  
+  vol_multiplier: 1.8  

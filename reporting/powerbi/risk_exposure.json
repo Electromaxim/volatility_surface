@@ -1,0 +1,4 @@
+"UHNW Protection": {  
+  "metrics": ["cost_bps", "tax_savings"],  
+  "thresholds": {"tier1": 200, "tier2": 150}  
+}  
